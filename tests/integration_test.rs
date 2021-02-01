@@ -1,6 +1,10 @@
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
+
+use levenshtein_diff as levenshtein;
+
 #[test]
 fn test_regeneration_of_target() {
-    use levenshtein_diff as levenshtein;
 
     let source = "SATURDAY";
     let target = "SUNDAY";
@@ -25,4 +29,33 @@ fn test_regeneration_of_target() {
     };
 
     assert_eq!(target, generated_target);
+}
+
+#[test]
+fn test_strings_have_same_distances() {
+    fn rand_alnum_string(n: usize) -> String {
+        thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(n)
+            .map(char::from)
+            .collect()
+    }
+
+    let mut rng = thread_rng();
+
+    let random_len_1: usize = rng.gen_range(1..10);
+    let random_len_2: usize = rng.gen_range(1..10);
+
+    let random_str_1 = rand_alnum_string(random_len_1);
+    let random_str_2 = rand_alnum_string(random_len_2);
+
+    let leven_naive = levenshtein::levenshtein_naive(&random_str_1, &random_str_2);
+    let (leven_tab, _) = levenshtein::levenshtein_tabulation(&random_str_1, &random_str_2);
+    let (leven_memo, _) = levenshtein::levenshtein_memoization(&random_str_1, &random_str_2);
+
+    // Putting all three assertions here though one would be redundant to easily identify the
+    // broken function if the test fails
+    assert_eq!(leven_naive, leven_tab);
+    assert_eq!(leven_naive, leven_memo);
+    assert_eq!(leven_tab, leven_memo);
 }

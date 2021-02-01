@@ -10,3 +10,6 @@ keywords = ["levenshtein", "generate-differences"]
 categories = ["algorithms"]
 readme = "README.md"
 edition = "2018"
+
+[dev-dependencies]
+rand = "0.8.3"
