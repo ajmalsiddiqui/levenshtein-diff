@@ -13,8 +13,7 @@ fn test_regeneration_of_target() {
     assert_eq!(expected_leven, dist);
 
     // Generate a sequence of edits (i.e. differences between source and target)
-    let edits = levenshtein::generate_edits(source, target, &mat)
-        .unwrap_or_else(|err| panic!(err));
+    let edits = levenshtein::generate_edits(source, target, &mat).unwrap_or_else(|err| panic!(err));
 
     // Apply edits to source to regenerate target. This results in a Vec
     let generated_target_vec = levenshtein::apply_edits(source, &edits);

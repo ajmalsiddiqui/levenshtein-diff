@@ -39,7 +39,7 @@ pub enum Edit<T: PartialEq> {
 ///
 /// assert_eq!(s2, expected_s2);
 /// ```
-pub fn apply_edits<T, U>(source: U, edits: &Vec<Edit<T>>) -> Vec<T>
+pub fn apply_edits<T, U>(source: U, edits: &[Edit<T>]) -> Vec<T>
 where
     T: Clone + PartialEq,
     U: AsRef<[T]>,
@@ -55,8 +55,8 @@ where
     // We iterate in the reverse order because we want to populate the inserts vector in the
     // reverse order of indices. This ensures that we don't need any operational transforms on the
     // inserts.
-    for i in (0..edits.len()).rev() {
-        match &edits[i] {
+    for edit in edits.iter().rev() {
+        match edit {
             Edit::Substitute(idx, val) => target_constructor[idx - 1] = Some(val.clone()),
             Edit::Delete(idx) => target_constructor[idx - 1] = None,
             Edit::Insert(idx, val) => inserts.push(Edit::Insert(*idx, val.clone())),
@@ -128,23 +128,12 @@ where
         let current_item = distances[source_idx][target_idx];
 
         // These represent the options we have: substitute, insert and delete
-        let substitute = if source_idx > 0 && target_idx > 0 {
-            Some(distances[source_idx - 1][target_idx - 1])
-        } else {
-            None
-        };
+        let substitute = Some(distances[source_idx - 1][target_idx - 1])
+            .filter(|_| source_idx > 0 && target_idx > 0);
 
-        let delete = if source_idx > 0 {
-            Some(distances[source_idx - 1][target_idx])
-        } else {
-            None
-        };
+        let delete = Some(distances[source_idx - 1][target_idx]).filter(|_| source_idx > 0);
 
-        let insert = if target_idx > 0 {
-            Some(distances[source_idx][target_idx - 1])
-        } else {
-            None
-        };
+        let insert = Some(distances[source_idx][target_idx - 1]).filter(|_| target_idx > 0);
 
         let min = min(min(insert, delete), substitute);
 

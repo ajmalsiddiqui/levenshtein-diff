@@ -34,20 +34,16 @@ where
     let source = source.as_ref();
     let target = target.as_ref();
 
-    // indices
-    let i: usize = source.len();
-    let j: usize = target.len();
-
     // base case
-    if min(i, j) == 0 {
-        return max(i, j);
+    if source.is_empty() || target.is_empty() {
+        return max(source.len(), target.len());
     }
 
-    let k = if source[i - 1] == target[j - 1] { 0 } else { 1 };
+    let k = if source.last() == target.last() { 0 } else { 1 };
 
-    let delete = levenshtein_naive(&source[..i - 1], target) + 1;
-    let insert = levenshtein_naive(source, &target[..j - 1]) + 1;
-    let substitute = levenshtein_naive(&source[..i - 1], &target[..j - 1]) + k;
+    let delete = levenshtein_naive(up_to_last(source), target) + 1;
+    let insert = levenshtein_naive(source, up_to_last(target)) + 1;
+    let substitute = levenshtein_naive(up_to_last(source), up_to_last(target)) + k;
 
     min(min(insert, delete), substitute)
 }
@@ -74,23 +70,23 @@ where
 /// let (leven_naive, _) = levenshtein::levenshtein_tabulation(s1, s2);
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_tabulation<T, U>(i1: U, i2: U) -> (usize, DistanceMatrix)
+pub fn levenshtein_tabulation<T, U>(source: U, target: U) -> (usize, DistanceMatrix)
 where
     T: PartialEq + Clone,
     U: AsRef<[T]>,
 {
-    let i1 = i1.as_ref();
-    let i2 = i2.as_ref();
+    let source = source.as_ref();
+    let target = target.as_ref();
 
-    let m = i1.len();
-    let n = i2.len();
+    let m = source.len();
+    let n = target.len();
 
     // table of distances
     let mut distances = get_distance_table(m, n);
 
     for i in 1..distances.len() {
         for j in 1..distances[0].len() {
-            let k = if i1[i - 1] == i2[j - 1] { 0 } else { 1 };
+            let k = if source[i - 1] == target[j - 1] { 0 } else { 1 };
 
             let delete = distances[i - 1][j] + 1;
             let insert = distances[i][j - 1] + 1;
@@ -125,56 +121,52 @@ where
 /// let (leven_naive, _) = levenshtein::levenshtein_memoization(s1, s2);
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_memoization<T, U>(i1: U, i2: U) -> (usize, DistanceMatrix)
+pub fn levenshtein_memoization<T, U>(source: U, target: U) -> (usize, DistanceMatrix)
 where
     T: PartialEq,
     U: AsRef<[T]>,
 {
     fn levenshtein_memoization_helper<T>(
-        i1: &[T],
-        i2: &[T],
-        i: usize,
-        j: usize,
+        source: &[T],
+        target: &[T],
         distances: &mut DistanceMatrix,
     ) -> usize
     where
         T: PartialEq,
     {
         // check the cache first
-        if distances[i][j] < usize::MAX {
-            return distances[i][j];
+        if distances[source.len()][target.len()] < usize::MAX {
+            return distances[source.len()][target.len()];
         }
 
         // base case
-        if min(i1[..i].len(), i2[..j].len()) == 0 {
-            return max(i1[..i].len(), i2[..j].len());
+        if source.is_empty() || target.is_empty() {
+            return max(source.len(), target.len());
         }
 
         // couldn't find the value, time to recursively calculate it
 
-        let k = if i1[i - 1] == i2[j - 1] { 0 } else { 1 };
+        let k = if source.last() == target.last() { 0 } else { 1 };
 
-        let delete = levenshtein_memoization_helper(i1, i2, i - 1, j, distances) + 1;
-        let insert = levenshtein_memoization_helper(i1, i2, i, j - 1, distances) + 1;
-        let substitute = levenshtein_memoization_helper(i1, i2, i - 1, j - 1, distances) + k;
+        let delete = levenshtein_memoization_helper(up_to_last(source), target, distances) + 1;
+        let insert = levenshtein_memoization_helper(source, up_to_last(target), distances) + 1;
+        let substitute =
+            levenshtein_memoization_helper(up_to_last(source), up_to_last(target), distances) + k;
 
         let distance = min(min(delete, insert), substitute);
 
         // update the cache
-        distances[i][j] = distance;
+        distances[source.len()][target.len()] = distance;
 
         distance
     }
 
-    let i1 = i1.as_ref();
-    let i2 = i2.as_ref();
+    let source = source.as_ref();
+    let target = target.as_ref();
 
-    let m = i1.len();
-    let n = i2.len();
+    let mut distances = get_distance_table(source.len(), target.len());
 
-    let mut distances = get_distance_table(m, n);
-
-    let distance = levenshtein_memoization_helper(i1, i2, m, n, &mut distances);
+    let distance = levenshtein_memoization_helper(source, target, &mut distances);
 
     (distance, distances)
 }

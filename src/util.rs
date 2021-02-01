@@ -14,7 +14,7 @@ pub fn print_table(table: &DistanceMatrix) {
 // The First column is 0..m+1
 // And the rest of the values are usize::MAX
 pub fn get_distance_table(m: usize, n: usize) -> DistanceMatrix {
-    let mut distances: Vec<Vec<usize>> = Vec::with_capacity(m + 1);
+    let mut distances = Vec::with_capacity(m + 1);
 
     // The first row
     distances.push((0..n + 1).collect());
@@ -27,4 +27,8 @@ pub fn get_distance_table(m: usize, n: usize) -> DistanceMatrix {
     }
 
     distances
+}
+
+pub fn up_to_last<T>(slice: &[T]) -> &[T] {
+    slice.split_last().map_or(&[], |(_, rest)| rest)
 }
