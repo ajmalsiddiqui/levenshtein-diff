@@ -39,11 +39,16 @@ where
         return max(source.len(), target.len());
     }
 
-    let k = if source.last() == target.last() { 0 } else { 1 };
+    if source.last() == target.last() {
+        // The item being looked at is the same, so it wouldn't contribute to the distance
+        return levenshtein_naive(up_to_last(source), up_to_last(target));
+    }
+
+    // The items being looked at are different, so we must consider all possibilities
 
     let delete = levenshtein_naive(up_to_last(source), target) + 1;
     let insert = levenshtein_naive(source, up_to_last(target)) + 1;
-    let substitute = levenshtein_naive(up_to_last(source), up_to_last(target)) + k;
+    let substitute = levenshtein_naive(up_to_last(source), up_to_last(target)) + 1;
 
     min(min(insert, delete), substitute)
 }
@@ -86,11 +91,15 @@ where
 
     for i in 1..distances.len() {
         for j in 1..distances[0].len() {
-            let k = if source[i - 1] == target[j - 1] { 0 } else { 1 };
+            if source[i - 1] == target[j - 1] {
+                // The item being looked at is the same, so the distance won't increase
+                distances[i][j] = distances[i - 1][j - 1];
+                continue;
+            }
 
             let delete = distances[i - 1][j] + 1;
             let insert = distances[i][j - 1] + 1;
-            let substitute = distances[i - 1][j - 1] + k;
+            let substitute = distances[i - 1][j - 1] + 1;
 
             distances[i][j] = min(min(delete, insert), substitute);
         }
