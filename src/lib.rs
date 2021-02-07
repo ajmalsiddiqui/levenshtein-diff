@@ -21,22 +21,16 @@ use util::DistanceMatrix;
 /// let s1 = "FLAW";
 /// let s2 = "LAWN";
 ///
-/// let (distance, _) = levenshtein::distance(s1, s2);
+/// let (distance, _) = levenshtein::distance(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(distance, 2);
 ///
 /// let v1 = vec![0, 1, 2];
 /// let v2 = vec![1, 2, 3, 4];
 ///
-/// let (distance, _) = levenshtein::distance(v1, v2); // Also works on vectors
+/// let (distance, _) = levenshtein::distance(&v1[..], &v2[..]); // Also works on vectors
 /// assert_eq!(distance, 3);
 /// ```
-pub fn distance<T, U>(source: U, target: U) -> (usize, DistanceMatrix)
-where
-    T: Eq,
-    // U is any type that can be trivially converted into a reference to a slice of type T
-    // i.e. &[T]
-    U: AsRef<[T]>,
-{
+pub fn distance<T: Eq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
     levenshtein_memoization(source, target)
 }
 
@@ -50,7 +44,7 @@ mod tests {
 
         let expected_dist = 2;
 
-        let (dist, _) = distance(s1, s2);
+        let (dist, _) = distance(s1.as_bytes(), s2.as_bytes());
 
         assert_eq!(expected_dist, dist);
     }

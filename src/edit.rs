@@ -26,11 +26,11 @@ pub enum Edit<T: PartialEq> {
 /// let s1 = "FLOWER";
 /// let expected_s2 = "FOLLOWER";
 ///
-/// let (_, matrix) = levenshtein::distance(s1, expected_s2);
+/// let (_, matrix) = levenshtein::distance(s1.as_bytes(), expected_s2.as_bytes());
 ///
-/// let edits = levenshtein::generate_edits(s1, expected_s2, &matrix).unwrap();
+/// let edits = levenshtein::generate_edits(s1.as_bytes(), expected_s2.as_bytes(), &matrix).unwrap();
 ///
-/// let target = levenshtein::apply_edits(s1, &edits);
+/// let target = levenshtein::apply_edits(s1.as_bytes(), &edits);
 ///
 /// let s2 = match std::str::from_utf8(&target) {
 ///     Ok(v) => v,
@@ -39,13 +39,7 @@ pub enum Edit<T: PartialEq> {
 ///
 /// assert_eq!(s2, expected_s2);
 /// ```
-pub fn apply_edits<T, U>(source: U, edits: &[Edit<T>]) -> Vec<T>
-where
-    T: Clone + PartialEq,
-    U: AsRef<[T]>,
-{
-    let source = source.as_ref();
-
+pub fn apply_edits<T: Clone + PartialEq>(source: &[T], edits: &[Edit<T>]) -> Vec<T> {
     // Convert each item of source into Some(item)
     let mut target_constructor: Vec<Option<T>> =
         source.iter().map(|item| Some(item.clone())).collect();
@@ -97,23 +91,16 @@ where
 /// let s1 = "SATURDAY";
 /// let s2 = "SUNDAY";
 ///
-/// let (_, matrix) = levenshtein::distance(s1, s2);
+/// let (_, matrix) = levenshtein::distance(s1.as_bytes(), s2.as_bytes());
 ///
 /// // This can be used with the `apply_edits` function to transform source to target
-/// let edits = levenshtein::generate_edits(s1, s2, &matrix).unwrap();
+/// let edits = levenshtein::generate_edits(s1.as_bytes(), s2.as_bytes(), &matrix).unwrap();
 /// ```
-pub fn generate_edits<T, U>(
-    source: U,
-    target: U,
+pub fn generate_edits<T: Clone + PartialEq>(
+    source: &[T],
+    target: &[T],
     distances: &DistanceMatrix,
-) -> Result<Vec<Edit<T>>, &'static str>
-where
-    T: Clone + PartialEq,
-    U: AsRef<[T]>,
-{
-    let source = source.as_ref();
-    let target = target.as_ref();
-
+) -> Result<Vec<Edit<T>>, &'static str> {
     let mut source_idx = source.len();
     let mut target_idx = target.len();
 
@@ -200,7 +187,7 @@ mod tests {
             Edit::<u8>::Delete(2),
         ];
 
-        let edits = generate_edits(&s1.as_bytes(), &s2.as_bytes(), &distances).unwrap();
+        let edits = generate_edits(s1.as_bytes(), s2.as_bytes(), &distances).unwrap();
 
         assert_eq!(do_vecs_match(&edits, &expected_edits), true);
     }
@@ -217,7 +204,7 @@ mod tests {
             Edit::<u8>::Delete(2),
         ];
 
-        let s2_bytes_vec = apply_edits(s1, &mut edits);
+        let s2_bytes_vec = apply_edits(s1.as_bytes(), &mut edits);
 
         let s2 = match std::str::from_utf8(&s2_bytes_vec) {
             Ok(v) => v,

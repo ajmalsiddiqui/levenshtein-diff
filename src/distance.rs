@@ -23,17 +23,10 @@ use crate::util::*;
 /// let s2 = "SUNDAY";
 /// let expected_leven = 3;
 
-/// let leven_naive = levenshtein::levenshtein_naive(s1, s2);
+/// let leven_naive = levenshtein::levenshtein_naive(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_naive<T, U>(source: U, target: U) -> usize
-where
-    T: PartialEq,
-    U: AsRef<[T]>,
-{
-    let source = source.as_ref();
-    let target = target.as_ref();
-
+pub fn levenshtein_naive<T: PartialEq>(source: &[T], target: &[T]) -> usize {
     // base case
     if source.is_empty() || target.is_empty() {
         return max(source.len(), target.len());
@@ -72,17 +65,13 @@ where
 /// let s2 = "SUNDAY";
 /// let expected_leven = 3;
 
-/// let (leven_naive, _) = levenshtein::levenshtein_tabulation(s1, s2);
+/// let (leven_naive, _) = levenshtein::levenshtein_tabulation(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_tabulation<T, U>(source: U, target: U) -> (usize, DistanceMatrix)
-where
-    T: PartialEq + Clone,
-    U: AsRef<[T]>,
-{
-    let source = source.as_ref();
-    let target = target.as_ref();
-
+pub fn levenshtein_tabulation<T: Clone + PartialEq>(
+    source: &[T],
+    target: &[T],
+) -> (usize, DistanceMatrix) {
     let m = source.len();
     let n = target.len();
 
@@ -127,22 +116,18 @@ where
 /// let s2 = "SUNDAY";
 /// let expected_leven = 3;
 
-/// let (leven_naive, _) = levenshtein::levenshtein_memoization(s1, s2);
+/// let (leven_naive, _) = levenshtein::levenshtein_memoization(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_memoization<T, U>(source: U, target: U) -> (usize, DistanceMatrix)
-where
-    T: PartialEq,
-    U: AsRef<[T]>,
-{
-    fn levenshtein_memoization_helper<T>(
+pub fn levenshtein_memoization<T: PartialEq>(
+    source: &[T],
+    target: &[T],
+) -> (usize, DistanceMatrix) {
+    fn levenshtein_memoization_helper<T: PartialEq>(
         source: &[T],
         target: &[T],
         distances: &mut DistanceMatrix,
-    ) -> usize
-    where
-        T: PartialEq,
-    {
+    ) -> usize {
         // check the cache first
         if distances[source.len()][target.len()] < usize::MAX {
             return distances[source.len()][target.len()];
@@ -170,9 +155,6 @@ where
         distance
     }
 
-    let source = source.as_ref();
-    let target = target.as_ref();
-
     let mut distances = get_distance_table(source.len(), target.len());
 
     let distance = levenshtein_memoization_helper(source, target, &mut distances);
@@ -190,7 +172,7 @@ mod tests {
         let s2 = String::from("FFLAWANN");
         let expected_leven = 4;
 
-        let leven_naive = levenshtein_naive(s1, s2);
+        let leven_naive = levenshtein_naive(s1.as_bytes(), s2.as_bytes());
 
         assert_eq!(leven_naive, expected_leven);
     }
@@ -201,7 +183,7 @@ mod tests {
         let s2 = String::from("FFLAWANN");
         let expected_leven = 4;
 
-        let (leven_memo, _) = levenshtein_memoization(s1, s2);
+        let (leven_memo, _) = levenshtein_memoization(s1.as_bytes(), s2.as_bytes());
 
         assert_eq!(leven_memo, expected_leven);
     }
@@ -212,7 +194,7 @@ mod tests {
         let s2 = String::from("FFLAWANN");
         let expected_leven = 4;
 
-        let (leven_tab, _) = levenshtein_tabulation(s1, s2);
+        let (leven_tab, _) = levenshtein_tabulation(s1.as_bytes(), s2.as_bytes());
 
         assert_eq!(leven_tab, expected_leven);
     }
