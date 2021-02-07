@@ -30,7 +30,7 @@ use util::DistanceMatrix;
 /// let (distance, _) = levenshtein::distance(&v1[..], &v2[..]); // Also works on vectors
 /// assert_eq!(distance, 3);
 /// ```
-pub fn distance<T: Eq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
+pub fn distance<T: PartialEq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
     levenshtein_memoization(source, target)
 }
 

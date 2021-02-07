@@ -11,7 +11,7 @@ In addition to that, it let's you generate a sequence of `Edit` values that repr
 * Three implementations of Levenshtein's algorithm: naive recursive, DP with tabulation and DP with memoization. Useful if you want to analyze and compare performance.
 * Generate the sequence of edits that, when applied to the source sequence, will regenrate the target sequence. Useful when you want to sync with a remote copy of your sequence efficiently.
 * Function to apply edits to a sequence in order to generate the target sequence.
-* Generic: works on a sequence of any type that implements `PartialEq` and `Clone`.
+* Generic: works on a sequence of any type that implements `PartialEq` (though the sequence will also have to implement `Clone` if you want to use the features related to generating and applying edits).
 
 ## Usage
 
