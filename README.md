@@ -19,7 +19,7 @@ In your `Cargo.toml`:
 
 ```toml
 [dependencies]
-levenshtein-diff = "0.2.0"
+levenshtein-diff = "0.2.1"
 ```
 
 In your project:
