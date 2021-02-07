@@ -1,6 +1,28 @@
 use std::cmp::min;
+use std::error::Error;
+use std::fmt;
 
 use crate::util::DistanceMatrix;
+
+/// Represents an error specific to working with the Levenshtein distance, or the generated
+/// distance matrix
+#[derive(Debug)]
+pub enum LevenshteinError {
+    // The supplied distance matrix is invalid
+    InvalidDistanceMatrixError,
+}
+
+impl fmt::Display for LevenshteinError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let error = match self {
+            LevenshteinError::InvalidDistanceMatrixError => "Invalid matrix error",
+        };
+
+        write!(f, "{}", error)
+    }
+}
+
+impl Error for LevenshteinError {}
 
 /// Represents an Edit applied on a source sequence.
 #[derive(Clone, PartialEq)]
@@ -100,12 +122,13 @@ pub fn generate_edits<T: Clone + PartialEq>(
     source: &[T],
     target: &[T],
     distances: &DistanceMatrix,
-) -> Result<Vec<Edit<T>>, &'static str> {
+) -> Result<Vec<Edit<T>>, LevenshteinError> {
     let mut source_idx = source.len();
     let mut target_idx = target.len();
 
-    assert_eq!(source_idx + 1, distances.len());
-    assert_eq!(target_idx + 1, distances[0].len());
+    if source_idx + 1 != distances.len() || target_idx + 1 != distances[0].len() {
+        return Err(LevenshteinError::InvalidDistanceMatrixError);
+    }
 
     let mut edits = Vec::<Edit<T>>::new();
 
@@ -141,10 +164,10 @@ pub fn generate_edits<T: Clone + PartialEq>(
                 source_idx = source_idx - 1;
                 target_idx = target_idx - 1;
             } else {
-                return Err("Invalid distance matrix");
+                return Err(LevenshteinError::InvalidDistanceMatrixError);
             };
         } else {
-            return Err("Invalid distance matrix");
+            return Err(LevenshteinError::InvalidDistanceMatrixError);
         };
     }
 
