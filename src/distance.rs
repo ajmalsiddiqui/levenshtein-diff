@@ -68,10 +68,7 @@ pub fn levenshtein_naive<T: PartialEq>(source: &[T], target: &[T]) -> usize {
 /// let (leven_naive, _) = levenshtein::levenshtein_tabulation(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_tabulation<T: Clone + PartialEq>(
-    source: &[T],
-    target: &[T],
-) -> (usize, DistanceMatrix) {
+pub fn levenshtein_tabulation<T: PartialEq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
     let m = source.len();
     let n = target.len();
 
