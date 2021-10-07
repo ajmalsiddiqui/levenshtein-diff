@@ -138,12 +138,23 @@ pub fn generate_edits<T: Clone + PartialEq>(
         let current_item = distances[source_idx][target_idx];
 
         // These represent the options we have: substitute, insert and delete
-        let substitute = Some(distances[source_idx - 1][target_idx - 1])
-            .filter(|_| source_idx > 0 && target_idx > 0);
+        let substitute = if source_idx > 0 && target_idx > 0 {
+            Some(distances[source_idx - 1][target_idx - 1])
+        } else {
+            None
+        };
 
-        let delete = Some(distances[source_idx - 1][target_idx]).filter(|_| source_idx > 0);
+        let delete = if source_idx > 0 {
+            Some(distances[source_idx - 1][target_idx])
+        } else {
+            None
+        };
 
-        let insert = Some(distances[source_idx][target_idx - 1]).filter(|_| target_idx > 0);
+        let insert = if target_idx > 0 {
+            Some(distances[source_idx][target_idx - 1])
+        } else {
+            None
+        };
 
         let min = min(min(insert, delete), substitute);
 
