@@ -62,3 +62,23 @@ fn test_strings_have_same_distances() {
     assert_eq!(leven_naive, leven_memo);
     assert_eq!(leven_tab, leven_memo);
 }
+
+#[test]
+fn test_for_cases_that_differ_by_one_item() {
+    // Test for issue https://github.com/ajmalsiddiqui/levenshtein-diff/issues/2
+
+    let source_collection: Vec<String> = vec!["Hello".into(), "World".into()];
+    let target_collection: Vec<String> = vec!["World".into()];
+
+    let (distance, matrix) = levenshtein_diff::distance(&source_collection, &target_collection);
+
+    assert_eq!(distance, 1);
+
+    let edits =
+        levenshtein_diff::generate_edits(&source_collection, &target_collection, &matrix).unwrap();
+
+    let generated_target_vec = levenshtein::apply_edits(&source_collection, &edits);
+
+    // Just a sanity check
+    assert_eq!(target_collection.len(), generated_target_vec.len())
+}

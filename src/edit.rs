@@ -139,29 +139,29 @@ pub fn generate_edits<T: Clone + PartialEq>(
 
         // These represent the options we have: substitute, insert and delete
         let substitute = if source_idx > 0 && target_idx > 0 {
-            Some(distances[source_idx - 1][target_idx - 1])
+            distances[source_idx - 1][target_idx - 1]
         } else {
-            None
+            usize::MAX
         };
 
         let delete = if source_idx > 0 {
-            Some(distances[source_idx - 1][target_idx])
+            distances[source_idx - 1][target_idx]
         } else {
-            None
+            usize::MAX
         };
 
         let insert = if target_idx > 0 {
-            Some(distances[source_idx][target_idx - 1])
+            distances[source_idx][target_idx - 1]
         } else {
-            None
+            usize::MAX
         };
 
         let min = min(min(insert, delete), substitute);
 
-        if min == Some(current_item) {
+        if min == current_item {
             source_idx = source_idx - 1;
             target_idx = target_idx - 1;
-        } else if min == Some(current_item - 1) {
+        } else if min == current_item - 1 {
             if min == insert {
                 // The edits are expected to be 1-indexed, but the slices obviously aren't
                 // Hence we do target_idx - 1 to access the right value
