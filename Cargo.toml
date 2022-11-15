@@ -1,7 +1,7 @@
 [package]
 name = "levenshtein-diff"
 license = "MIT"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Mohammed Ajmal Siddiqui <ajmalsiddiqui21@gmail.com>"]
 description = "Generic implementation of Levenshtein's algorithm that also allows you to generate the edits required to convert a source sequence to a target, and apply them to the source sequence to regenerate the target."
 homepage = "https://github.com/ajmalsiddiqui/levenshtein-diff"
