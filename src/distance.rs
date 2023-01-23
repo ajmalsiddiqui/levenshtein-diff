@@ -75,8 +75,8 @@ pub fn levenshtein_tabulation<T: PartialEq>(source: &[T], target: &[T]) -> (usiz
     // table of distances
     let mut distances = get_distance_table(m, n);
 
-    for i in 1..distances.len() {
-        for j in 1..distances[0].len() {
+    for i in 1..distances.rows() {
+        for j in 1..distances.cols() {
             if source[i - 1] == target[j - 1] {
                 // The item being looked at is the same, so the distance won't increase
                 distances[i][j] = distances[i - 1][j - 1];
