@@ -1,12 +1,12 @@
-pub type DistanceMatrix = Vec<Vec<usize>>;
+use grid::Grid;
+
+pub type DistanceMatrix = Grid<usize>;
 
 pub fn print_table(table: &DistanceMatrix) {
-    for row in table {
-        for item in row {
-            print!("{} ", item);
-        }
+    (0..table.rows()).for_each(|row| {
+        table.iter_row(row).for_each(|item| print!(" {}", item));
         println!("");
-    }
+    });
 }
 
 // Returns an initialized distance table of dimensions m+1 * n+1
@@ -14,18 +14,9 @@ pub fn print_table(table: &DistanceMatrix) {
 // The First column is 0..m+1
 // And the rest of the values are usize::MAX
 pub fn get_distance_table(m: usize, n: usize) -> DistanceMatrix {
-    let mut distances = Vec::with_capacity(m + 1);
-
-    // The first row
-    distances.push((0..n + 1).collect());
-
-    for i in 1..m + 1 {
-        // initialize the whole row to sentinel
-        distances.push(vec![usize::MAX; n + 1]);
-        // update the first item in the row
-        distances[i][0] = i;
-    }
-
+    let mut distances = Grid::init(m + 1, n + 1, usize::MAX);
+    (0..=n).for_each(|i| distances[0][i] = i);
+    (1..=m).for_each(|i| distances[i][0] = i);
     distances
 }
 

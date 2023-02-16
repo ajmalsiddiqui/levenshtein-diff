@@ -126,7 +126,7 @@ pub fn generate_edits<T: Clone + PartialEq>(
     let mut source_idx = source.len();
     let mut target_idx = target.len();
 
-    if source_idx + 1 != distances.len() || target_idx + 1 != distances[0].len() {
+    if source_idx + 1 != distances.rows() || target_idx + 1 != distances.cols() {
         return Err(LevenshteinError::InvalidDistanceMatrixError);
     }
 
@@ -188,6 +188,7 @@ pub fn generate_edits<T: Clone + PartialEq>(
 #[cfg(test)]
 mod tests {
     use crate::edit::*;
+    use grid::grid;
 
     // Copied verbatim from
     // https://stackoverflow.com/questions/29504514/whats-the-best-way-to-compare-2-vectors-or-strings-element-by-element
@@ -203,16 +204,16 @@ mod tests {
 
         // This is the distance matrix for the strings
         // SATURDAY and SUNDAY
-        let distances = vec![
-            vec![0, 1, 2, 3, 4, 5, 6],
-            vec![1, 0, 1, 2, 3, 4, 5],
-            vec![2, 1, 1, 2, 3, 3, 4],
-            vec![3, 2, 2, 2, 3, 4, 4],
-            vec![4, 3, 2, 3, 3, 4, 5],
-            vec![5, 4, 3, 3, 4, 4, 5],
-            vec![6, 5, 4, 4, 3, 4, 5],
-            vec![7, 6, 5, 5, 4, 3, 4],
-            vec![8, 7, 6, 6, 5, 4, 3],
+        let distances = grid![
+            [0, 1, 2, 3, 4, 5, 6]
+            [1, 0, 1, 2, 3, 4, 5]
+            [2, 1, 1, 2, 3, 3, 4]
+            [3, 2, 2, 2, 3, 4, 4]
+            [4, 3, 2, 3, 3, 4, 5]
+            [5, 4, 3, 3, 4, 4, 5]
+            [6, 5, 4, 4, 3, 4, 5]
+            [7, 6, 5, 5, 4, 3, 4]
+            [8, 7, 6, 6, 5, 4, 3]
         ];
 
         let expected_edits = vec![
