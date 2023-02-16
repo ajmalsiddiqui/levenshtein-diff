@@ -31,7 +31,7 @@ use util::DistanceMatrix;
 /// assert_eq!(distance, 3);
 /// ```
 pub fn distance<T: PartialEq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
-    levenshtein_memoization(source, target)
+    levenshtein_tabulation(source, target)
 }
 
 #[cfg(test)]
