@@ -9,6 +9,22 @@ pub fn print_table(table: &DistanceMatrix) {
     }
 }
 
+pub fn remove_common_affix<'a, 'b, T: PartialEq>(s1: &'a[T], s2: &'b[T]) -> (&'a[T], &'b[T]) {
+    let prefix_len = s1.iter()
+        .zip(s2.iter())
+        .take_while(|t| t.0 == t.1)
+        .count();
+    let suffix_len = s1[prefix_len..].iter()
+        .rev()
+        .zip(s2[prefix_len..].iter().rev())
+        .take_while(|t| t.0 == t.1)
+        .count();
+
+    let s1 = &s1[prefix_len .. s1.len() - suffix_len];
+    let s2 = &s2[prefix_len .. s2.len() - suffix_len];
+    (s1, s2)
+}
+
 // Returns an initialized distance table of dimensions m+1 * n+1
 // Where the first row is 0..n+1
 // The First column is 0..m+1
