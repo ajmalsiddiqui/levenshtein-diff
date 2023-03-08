@@ -68,7 +68,8 @@ pub fn levenshtein_naive<T: PartialEq>(source: &[T], target: &[T]) -> usize {
 /// let (leven_naive, _) = levenshtein::levenshtein_tabulation(s1.as_bytes(), s2.as_bytes());
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
-pub fn levenshtein_tabulation<T: PartialEq>(source: &[T], target: &[T]) -> (usize, DistanceMatrix) {
+pub fn levenshtein_tabulation<T: PartialEq>(mut source: &[T], mut target: &[T]) -> (usize, DistanceMatrix) {
+    remove_common_affix(&mut source, &mut target);
     let m = source.len();
     let n = target.len();
 
@@ -117,8 +118,8 @@ pub fn levenshtein_tabulation<T: PartialEq>(source: &[T], target: &[T]) -> (usiz
 /// assert_eq!(leven_naive, expected_leven);
 /// ```
 pub fn levenshtein_memoization<T: PartialEq>(
-    source: &[T],
-    target: &[T],
+    mut source: &[T],
+    mut target: &[T],
 ) -> (usize, DistanceMatrix) {
     fn levenshtein_memoization_helper<T: PartialEq>(
         source: &[T],
@@ -152,6 +153,7 @@ pub fn levenshtein_memoization<T: PartialEq>(
         distance
     }
 
+    remove_common_affix(&mut source, &mut target);
     let mut distances = get_distance_table(source.len(), target.len());
 
     let distance = levenshtein_memoization_helper(source, target, &mut distances);
